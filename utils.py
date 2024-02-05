@@ -6,10 +6,9 @@ from scipy.integrate import simps
 from diffusers import DDIMInverseScheduler, StableDiffusionPipeline, PNDMScheduler
 from scipy.signal import savgol_filter
 import numpy as np
-
-
 from typing import *
 from torchvision import transforms
+from copy import deepcopy
 
 
 def simpsons_1_3_from_list(mylist):
@@ -38,7 +37,7 @@ def multivariate_gaussian_log_likelihood(x):
 
 
 class CAS_preprocessor(object):
-    def __init__(self, model = 'SD1.5', dtype = torch.float32, device = 'cuda', scheduler = None, approx_num = 1, num_inference_steps = 50, epsilon = 1e-3):
+    def __init__(self, model = 'SD1.5', dtype = torch.float32, device = 'cuda', scheduler = None, approx_num = 1, num_inference_steps = 50, epsilon = 1e-3, rec_num = 1):
         self.pipe, self.vae, self.unet, self.text_encoder = {}, {}, {}, {}
         self.dtype = dtype
         self.device = device
@@ -60,6 +59,7 @@ class CAS_preprocessor(object):
         self.approx_num = approx_num
         self.num_inference_steps = num_inference_steps
         self.epsilon = epsilon
+        self.rec_num = rec_num
 
     def preprocess(self, image, prompt):
         height = self.unet.config.sample_size * self.pipe.vae_scale_factor
@@ -80,18 +80,19 @@ class CAS_preprocessor(object):
             for t in tqdm(timesteps):
                 rand_eps = torch.randint(low=0, high=2, size=(self.approx_num, *init_latents.shape[1:]), dtype = self.dtype).cuda() * 2 - 1
                 grad_fn_eps = {}
-                for preprocess_type in latents.keys():
-                    latents[preprocess_type] = latents[preprocess_type].detach()
-                    latents_eps = latents[preprocess_type].clone() + self.epsilon * rand_eps
-
-                    latent_model_input = self.scheduler.scale_model_input(latents[preprocess_type], t)
-                    latent_eps_model_input = self.scheduler.scale_model_input(latents_eps, t)
-
-                    noise_pred = self.pipe.unet(latent_model_input, t, encoder_hidden_states=text_embeddings[preprocess_type].detach()).sample
-                    noise_pred_eps = self.pipe.unet(latent_eps_model_input, t, encoder_hidden_states = text_embeddings[preprocess_type].expand(self.approx_num, -1, -1)).sample
-                    
-                    grad_fn_eps[preprocess_type] = (noise_pred_eps - noise_pred) / self.epsilon
-                    latents[preprocess_type] = self.scheduler.step(noise_pred, t, latents[preprocess_type]).prev_sample
+                latents_default = deepcopy(latents)
+                for rec_iter in range(self.rec_num):
+                    for preprocess_type in latents.keys():
+                        latent_model_input = self.scheduler.scale_model_input(latents[preprocess_type], t)
+                        noise_pred = self.pipe.unet(latent_model_input, t, encoder_hidden_states=text_embeddings[preprocess_type].detach()).sample
+    
+                        if rec_iter == 0:
+                            latents_eps = latents[preprocess_type].clone() + self.epsilon * rand_eps
+                            latent_eps_model_input = self.scheduler.scale_model_input(latents_eps, t)
+                            noise_pred_eps = self.pipe.unet(latent_eps_model_input, t, encoder_hidden_states = text_embeddings[preprocess_type].expand(self.approx_num, -1, -1)).sample
+                        
+                            grad_fn_eps[preprocess_type] = (noise_pred_eps - noise_pred) / self.epsilon
+                        latents[preprocess_type] = self.scheduler.step(noise_pred, t, latents_default[preprocess_type]).prev_sample
 
                 for preprocess_type in ['total', 'cond', 'uncond']:
                     if preprocess_type == 'total':
@@ -130,7 +131,7 @@ class CAS_integrator(object):
             self.scheduler = scheduler
         self.timesteps = scheduler.timesteps
         self.coef_list = self.get_coef_list()
-    def score(self, log_likelihood, jacobian_list, jacobian_range = [1,None], method = 'simpsons_1_3'):
+    def score(self, log_likelihood, jacobian_list, jacobian_range = [1,-1], method = 'simpsons_3_8'):
         if isinstance(jacobian_list, list):
             jacobian_list = np.array(jacobian_list)
         if len(jacobian_list.shape) == 2:

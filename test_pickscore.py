@@ -18,32 +18,22 @@ from accelerate.utils import set_seed
 from diffusers import DDPMScheduler, StableDiffusionPipeline, PNDMScheduler, EulerAncestralDiscreteScheduler, SchedulerMixin, LMSDiscreteScheduler, DDIMScheduler, DDIMInverseScheduler
 from diffusers.schedulers.scheduling_utils import SchedulerOutput
 from diffusers.schedulers.scheduling_lms_discrete import LMSDiscreteSchedulerOutput
-# import insightface
-# from insightface.app import FaceAnalysis
 from PIL import Image
-# from insightface.data import get_image as ins_get_image
-# import cv2 as cv
 import torch.nn.functional as F
-# from onnx2torch import convert
 from torchvision import transforms
 import warnings
 
 from scipy.stats import multivariate_normal
 import argparse
-# from likelihood_schedulers import DDIMInverseSchedulerWithLikelihood, LMSDiscreteSchedulerWithLikelihood
 import shutil
 import pandas as pd
 import pickle
 
 import torch
-from torchmetrics.multimodal.clip_score import CLIPScore
 from datasets import load_dataset
-from pickscore import calc_probs
 from utils import CAS
 import requests
 from io import BytesIO
-
-metric = CLIPScore(model_name_or_path="openai/clip-vit-base-patch16")
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--save_path', type=str, default=None)
@@ -61,16 +51,12 @@ args = parser.parse_args()
 cas = CAS(args.total_step)
 
 pipe = StableDiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5", safety_checker=None)
-# model_id = "dreamlike-art/dreamlike-photoreal-2.0"
-# model_id = "stabilityai/stable-diffusion-2-1"
-# pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16, safety_checker = None)
 pipe.enable_xformers_memory_efficient_attention()
 
 text_encoder = pipe.text_encoder
 vae = pipe.vae
 unet = pipe.unet
 unet.to("cuda", dtype=torch.float32)
-# unet.to("cuda", dtype=torch.float16)
 text_encoder.requires_grad_(False)
 unet.requires_grad_(False)
 text_encoder.to("cuda")
@@ -78,7 +64,6 @@ for param in vae.parameters():
     param.requires_grad = False
 vae.requires_grad_(False)
 vae.to("cuda", dtype=torch.float32)
-# vae.to("cuda", dtype=torch.float16)
 unet.eval()
 text_encoder.eval()
 vae.eval()
