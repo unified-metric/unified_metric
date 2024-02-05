@@ -10,7 +10,7 @@ import time
 import json
 import numpy as np
 import traceback
-from utils import metrics
+#from utils import metrics
 
 from tqdm import tqdm
 import torch
@@ -31,7 +31,7 @@ import pickle
 
 import torch
 from datasets import load_dataset
-from utils import CAS
+from utils import *
 import requests
 from io import BytesIO
 
@@ -47,8 +47,6 @@ parser.add_argument('--lambd', type=float, default=1.)
 parser.add_argument('--val', action = 'store_true')
 
 args = parser.parse_args()
-
-cas = CAS(args.total_step)
 
 pipe = StableDiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5", safety_checker=None)
 pipe.enable_xformers_memory_efficient_attention()
@@ -89,6 +87,8 @@ negative_prompt = ""
 
 scheduler = DDIMInverseScheduler(beta_start=0.00085, beta_end=0.012, beta_schedule="scaled_linear", clip_sample=False, compute_likelihood=False, set_alpha_to_zero=False)
 
+cas = CAS_integrator(args.total_step, scheduler = scheduler)
+
 # 4. Prepare timesteps
 device = pipe._execution_device
 scheduler.set_timesteps(num_inference_steps, device=device)
@@ -96,7 +96,8 @@ scheduler.set_timesteps(num_inference_steps, device=device)
 timesteps = scheduler.timesteps
 
 if args.val == False:
-    dataset = load_dataset("yuvalkirstain/pickapic_v1_no_images")['test_unique']
+    #dataset = load_dataset("yuvalkirstain/pickapic_v1_no_images")['test_unique']
+    dataset = load_dataset("yuvalkirstain/pickapic_v1", split = 'test_unique',streaming = True)
 else:
     dataset = load_dataset("yuvalkirstain/pickapic_v1_no_images")['validation_unique']
 
@@ -124,11 +125,11 @@ if (coef_list == 1.).any():
 # scheduler.reset()
 num_channels_latents = pipe.unet.in_channels
 
-metrics = metrics()
+#metrics = metrics()
 
 
-ans_dict = {'hps':[], 'image_reward':[], 'pick_score':[], 'clip_score':[]}
-for i in rec_num_list: ans_dict[f'ddim_{i}'] = []
+#ans_dict = {'hps':[], 'image_reward':[], 'pick_score':[], 'clip_score':[]}
+#for i in rec_num_list: ans_dict[f'ddim_{i}'] = []
 
 print(timesteps)
 
@@ -137,12 +138,14 @@ for prompt_idx, data in enumerate(dataset):
         if args.resume > 0 and prompt_idx < args.resume:
             continue
         prompt = data['caption']
-        img_0 = Image.open(BytesIO(requests.get(data['image_0_url']).content)).resize((512,512))
-        img_1 = Image.open(BytesIO(requests.get(data['image_1_url']).content)).resize((512,512))
+        img_0 = Image.open(BytesIO(data['jpg_0'])).resize((512,512))
+        #img_0 = Image.open('/home/jovyan/fileviewer/ChunsanHong/cas/exp/prompt_0/image_0.png')
+        img_1 = Image.open(BytesIO(data['jpg_1'])).resize((512,512))
         label = 1 - data['label_0']
         if label == 0.5:
             continue
-        score_dict = metrics.score(prompt, [img_0,img_1])
+        #score_dict = metrics.score(prompt, [img_0,img_1])
+        score_dict = {}
         for rec in rec_num_list: score_dict[f'ddim_{rec}'] = []
         score_dict['answer'] = label
         score_dict['prompt'] = prompt
@@ -258,7 +261,7 @@ for prompt_idx, data in enumerate(dataset):
                                 del tj_samples
                                 latents.requires_grad_(False)
                                 latents_uncond.requires_grad_(False)
-                            
+    
                             latents = scheduler.step(noise_pred, t, latents_default).prev_sample
                             latents_uncond = scheduler.step(noise_pred_uncond, t, latents_uncond_default).prev_sample
                     inversed_latent[rec_num] = latents.detach().clone()
@@ -287,10 +290,11 @@ for prompt_idx, data in enumerate(dataset):
             pickle.dump(result_dict,f)
         with open(f'{args.save_path}/prompt_{prompt_idx}/score_dict.pickle', 'wb') as f:
             pickle.dump(score_dict,f)
-        for key in ans_dict.keys():
-            pred = int(score_dict[key][0] < score_dict[key][1])
-            ans_dict[key].append((pred==score_dict['answer']))
-            print(f'{key}: {sum(ans_dict[key])/len(ans_dict[key])}')
+        #for key in ans_dict.keys():
+        #    pred = int(score_dict[key][0] < score_dict[key][1])
+        #    ans_dict[key].append((pred==score_dict['answer']))
+        #    print(f'{key}: {sum(ans_dict[key])/len(ans_dict[key])}')
+        breakpoint()
         print(f'total #: {len(ans_dict[key])}')
         # if len(ans_dict[key]) == 100:
         #     break
