@@ -13,6 +13,11 @@ Examples of generated samples ordered by our universal score for various conditi
 From left to right, the sequence shows the conditional diffusion model used, the employed condition, two high-ranked samples, and two low-ranked samples. The last column’s generation is audio, so it is visualized using a Mel Spectrogram. Our metric demonstrates automatic and reliable assessment of perceptual alignment between condition and generated results (i.e., cherry-picking without humans) across text-to-image models (Stable Diffusion V1.5), diffusion models trained on specific domains such as Van Gogh, InstructPix2Pix, ControlNet, and AudioLDM, but not limited to.
 
 ## How to run the code
+### Dependencies
+Run the following to install a subset of necessary python packages for our code
+```
+pip install -r requirements.txt
+```
 
 ## References
 If you find the code useful for your research, please consider citing
