@@ -16,7 +16,7 @@ From left to right, the sequence shows the conditional diffusion model used, the
 
 ## References
 If you find the code useful for your research, please consider citing
-'''
+```
 @inproceedings{
   hong2024CAS,
   title={CAS: A Probability-based Approach for Universal Condition Alignment Score},
@@ -25,4 +25,4 @@ If you find the code useful for your research, please consider citing
   year={2024},
   url={https://openreview.net/forum?id=E78OaH2s3f}
 }
-'''
+```
