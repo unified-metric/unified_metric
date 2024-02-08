@@ -54,7 +54,7 @@ class CAS_preprocessor(object):
         self.unet = self.pipe.unet
         self.unet.eval()
         self.unet.requires_grad_(False)
-        self.unet.to(memory_format=torch.channels_last)
+        #self.unet.to(memory_format=torch.channels_last)
         self.image_transforms = transforms.Compose([transforms.ToTensor(), transforms.Normalize([0.5], [0.5]), ])
         self.approx_num = approx_num
         self.num_inference_steps = num_inference_steps
@@ -85,7 +85,7 @@ class CAS_preprocessor(object):
                     for preprocess_type in latents.keys():
                         latent_model_input = self.scheduler.scale_model_input(latents[preprocess_type], t)
                         noise_pred = self.pipe.unet(latent_model_input, t, encoder_hidden_states=text_embeddings[preprocess_type].detach()).sample
-    
+                        #breakpoint()
                         if rec_iter == 0:
                             latents_eps = latents[preprocess_type].clone() + self.epsilon * rand_eps
                             latent_eps_model_input = self.scheduler.scale_model_input(latents_eps, t)
