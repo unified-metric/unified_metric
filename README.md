@@ -22,7 +22,7 @@ From left to right, the sequence shows the conditional diffusion model used, the
 
 ## How to run the code
 ### Dependencies
-Run the following to install a subset of necessary python packages for our code.
+Run the following to install a subset of the necessary Python packages for our code. Make sure that the installed versions of packages and the specified versions are identical. Since CAS requires exact measurements, minor details can cause significant differences. Specifically, the cumulative product of alphas is a bit different in the DDIM scheduler, which may result in different reproduction outcomes.
 ```
 pip install -r requirements.txt
 ```
