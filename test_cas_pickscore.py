@@ -11,9 +11,9 @@ from io import BytesIO
 import glob
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--total_step', type=int, default=10)
-parser.add_argument('--approx_num', type=int, default=20)
-parser.add_argument('--rec_num', type=int, default=2)
+parser.add_argument('--total_step', type=int, default=10, help = 'The number of total step of DDIM inversion and measuring CAS')
+parser.add_argument('--approx_num', type=int, default=20, help = 'The number of measuring gradient to measrue \del f(x)')
+parser.add_argument('--rec_num', type=int, default=2, help = 'The degree of recursive DDIM inversion to implement inversion')
 
 args = parser.parse_args()
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -40,4 +40,3 @@ for data in dataset:
     total += 1
     if pred == label: right += 1
     print(f'Processed Image #: {total}, Current Accuracy: {right/total:.3f}')
-unused_idx = np.array([ 34,  38,  65,  68,  74, 160, 285, 292, 304, 343, 344, 378, 431])
