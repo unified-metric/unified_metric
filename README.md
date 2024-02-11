@@ -22,9 +22,15 @@ From left to right, the sequence shows the conditional diffusion model used, the
 
 ## How to run the code
 ### Dependencies
-Run the following to install a subset of necessary python packages for our code
+Run the following to install a subset of necessary python packages for our code.
 ```
 pip install -r requirements.txt
+```
+
+### Experiment Reproduction on PickScore dataset
+Run the following to reproduce our experiment on the PickScore dataset. To reproduce the experiment, just use the default command-line arguments. Please note that the result might slightly change due to the JPEG decompression codec of your computer. The PickScore dataset had offered PNG files in the past, yet it now offers JPEG files. We confirmed using 3 different computers with different codecs that the CAS value itself may differ, but the overall result is almost the same. Please inform us if there is a critical degradation in performance. If there is a problem, we will consider ways to share PNG files.
+```
+python test_cas_pickscore.py --total_step #your_total_step --approx_num #your_approx_num --rec_num #your_rec_num
 ```
 
 ## References
