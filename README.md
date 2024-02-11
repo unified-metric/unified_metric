@@ -2,12 +2,15 @@
 
 >This repository contains the official implementation for the paper [CAS: A Probability-based Approach for Universal Condition Alignment Score](https://openreview.net/forum?id=E78OaH2s3f) <br> by [Chunsan Hong](https://sites.google.com/view/chunsanhong)<sup>\*</sup>, Byunghee Cha<sup>\*</sup>, Tae-Hyun Oh.
 
+## Updates
+*[02/11/2024] We released our code. Anyone can reproduce our experiment on the PickScore dataset. Please note that the reproduction code for the experiment on the Van Gogh dataset and multimodal dataset we built will be released soon.
 
-We propose a universal condition alignment score that leverages the conditional probability measurable through the diffusion process. Our technique operates across all conditions and requires no additional models beyond the diffusion model used for generation, effectively enabling self-rejection. Our experiments validate that our metric effectively applies in diverse conditional generations, such as text-to-image, {instruction, image}-to-image, edge-/scribble-to-image, and text-to-audio. The basic idea is captured in the figure below:
-
+## About our paper
+We propose a universal condition alignment score that leverages the conditional probability measurable through the diffusion process. Our technique operates across all conditions and requires no additional models beyond the diffusion model used for generation, effectively enabling self-rejection. Our experiments validate that our metric effectively applies in diverse conditional generations, such as text-to-image, {instruction, image}-to-image, edge-/scribble-to-image, and text-to-audio. 
+<!--The basic idea is captured in the figure below:
 
 ![Method Overview](assets/figures/mthd.png)
-
+-->
 
 Examples of generated samples ordered by our universal score for various conditions is shown in the figure below:
 
