@@ -1,8 +1,9 @@
 # CAS: A Probability-based Approach for Universal Condition Alignment Score
 
 >This repository contains the official implementation for the paper [CAS: A Probability-based Approach for Universal Condition Alignment Score](https://openreview.net/forum?id=E78OaH2s3f) <br> by [Chunsan Hong](https://sites.google.com/view/chunsanhong)<sup>\*</sup>, ByungHee Cha<sup>\*</sup>, Tae-Hyun Oh.
-[Project Page](https://unified-metric.github.io/)
 
+
+[Project Page](https://unified-metric.github.io/)
 
 ## Updates
 * [02/11/2024] We released our code. Anyone can reproduce our experiment on the PickScore dataset. Please note that the reproduction code for the experiment on the Van Gogh dataset and multimodal dataset we built will be released soon.
