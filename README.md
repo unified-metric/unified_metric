@@ -41,6 +41,15 @@ Run the following to reproduce our experiment on the PickScore dataset. To repro
 python test_cas_pickscore.py --total_step #your_total_step --approx_num #your_approx_num --rec_num #your_rec_num
 ```
 
+## Implementation Detail
+
+
+Our research implements the DDIM inversion by performing the opposite operation of the DDIM pipeline in diffusers. However, at the time our research began, the version of diffusers was 0.17.1, and we observed that the implementation of the very first step in the DDIM inversion scheduler and the last step of the DDIM scheduler were significantly different. At that time, our internal experiments showed that skipping the first step of DDIM inversion actually reduced the reconstruction loss. Therefore, in our technique, we also skip the first step in the inversion.
+
+
+Our CAS equation is written as an integral with respect to \(dt\). However, we convert this into the \(d\alpha\) domain for calculation, changing it to \(\alpha'(t)dt = \alpha d\alpha\). Moreover, the difference between the alpha of the current \(t\) and the alpha of the previous \(t\) is approximated as \(d\alpha\), and it is implemented through solving with a numerical solver. Through experiments, we found that using Simpson's 3/8 rule for the numerical solver yields the highest accuracy.
+
+
 ## References
 If you find the code useful for your research, please consider citing
 ```
