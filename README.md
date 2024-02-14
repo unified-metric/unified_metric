@@ -1,4 +1,4 @@
-# CAS: A Probability-based Approach for Universal Condition Alignment Score [ICLR'23 SPOTLIGHT]
+# CAS: A Probability-based Approach for Universal Condition Alignment Score [ICLR'24 Spotlight]
 
 >This repository contains the official implementation for the paper [CAS: A Probability-based Approach for Universal Condition Alignment Score](https://openreview.net/forum?id=E78OaH2s3f) <br> by [Chunsan Hong](https://sites.google.com/view/chunsanhong)<sup>\*</sup>, ByungHee Cha<sup>\*</sup>, [Tae-Hyun Oh](https://ami.postech.ac.kr/members/tae-hyun-oh).
 
