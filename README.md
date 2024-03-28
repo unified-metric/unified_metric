@@ -36,8 +36,6 @@ pip install -r requirements.txt
 We demonstrate the performance of our technique on the PickScore benchmark to evaluate the capability of CAS as an alignment score between text and image. The PickScore dataset contains two pairs of images for each prompt, along with human preference labels. Here, we measure how well CAS aligns with human preferences. For more information on the PickScore dataset, please refer to https://github.com/yuvalkirstain/PickScore.
 
 
-![Generated Samples Examples](assets/figures/result_pickscore.png)
-
 
 Run the following to reproduce our experiment on the PickScore dataset. To reproduce the experiment, just use the default command-line arguments. Please note that the result might slightly change due to the JPEG decompression codec of your computer. The PickScore dataset had offered PNG files in the past, yet it now offers JPEG files. We confirmed using 3 different computers with different codecs that the CAS value itself may differ, but the overall result is almost the same. Please inform us if there is a critical degradation in performance. If there is a problem, we will consider ways to share PNG files.
 ```
